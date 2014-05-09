@@ -1,6 +1,7 @@
 
 exports.config = 
- dir : "handlers"
- files : [
-  "msg.iced"
- ]
+  dir : "handlers"
+  files : [
+    "msg.iced"
+    "thread.iced"
+  ]

@@ -1,6 +1,6 @@
 
 bhs    = require 'base-http-server'
-Base   = bhs.sct.SelfCertifyingToken
+Base   = bhs.sct.SelfCertifiedToken
 mm     = bhs.mod.mgr
 idmod  = bhs.id
 sc     = bhs.status.codes
@@ -11,9 +11,9 @@ sc     = bhs.status.codes
 
 exports.config = config = ({gen}) ->
   cfg = 
-    lifeftime : mm.config.security.sct.lifetime
+    lifetime : mm.config.security.sct.lifetime
     key : mm.config.secrets.sct_key
-    klass : SelfCertifyingToken
+    klass : SelfCertifiedToken
   if gen
     cfg.id = idmod.generate mm.config.id.sct 
   return cfg
@@ -21,20 +21,21 @@ exports.config = config = ({gen}) ->
 #=============================================================================
 
 exports.generate = (cb) ->
-  tok = new SelfCertifyingToken config {gen : true }
+  cfg = config { gen : true }
+  tok = new SelfCertifiedToken { cfg } 
   await tok.generate_to_client defer err, out
   cb err, out
 
 #=============================================================================
 
-export.check = (raw, cb) ->
+exports.check = (raw, cb) ->
   cfg = config { gen : false }
-  await SelfCertifyingToken.check_from_client raw, cfg, defer err, obj
+  await SelfCertifiedToken.check_from_client raw, cfg, defer err, obj
   cb err, obj
 
 #=============================================================================
 
-class SelfCertifyingToken extends Base
+class SelfCertifiedToken extends Base
 
   check_replay : (cb) ->
     q = "INSERT INTO used_challenge_tokens (token_id, ctime) VALUES(?,?)"

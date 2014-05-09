@@ -2,7 +2,7 @@
 bhs                   = require 'base-http-server'
 {Handler,GET,POST}    = bhs.base
 {api_route}           = require '../lib/urls'
-sct                   = require './sct'
+sct                   = require '../lib/sct'
 
 #=============================================================================
 
