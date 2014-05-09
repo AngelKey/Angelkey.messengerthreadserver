@@ -1,6 +1,6 @@
 
 exports.required = [
-  'db', 'handlers', 'host'
+  'db', 'handlers', 'host', 'id'
 ]
 
 exports.optional = [
