@@ -1,0 +1,29 @@
+{
+  "name": "messenger-thread-server",
+  "version": "0.0.0",
+  "description": "Keybase.io Messenger Reference Inbox Server",
+  "main": "bin/run.js",
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/keybase/messenger-thread-server"
+  },
+  "keywords": [
+    "secure",
+    "messaging"
+  ],
+  "author": "Maxwell Krohn",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/keybase/messenger-thread-server/issues"
+  },
+  "homepage": "https://github.com/keybase/messenger-thread-server",
+  "dependencies": {
+    "kbpgp": "^0.1.14",
+    "mysql": "^2.2.0",
+    "read": "^1.0.5",
+    "iced-logger": "0.0.3"
+  }
+}
