@@ -4,5 +4,5 @@ exports.required = [
 ]
 
 exports.optional = [
-  'dbpw'
+  'secrets'
 ]
