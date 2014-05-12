@@ -4,15 +4,16 @@ bhs                   = require 'base-http-server'
 {api_route}           = require '../lib/urls'
 sct                   = require '../lib/sct'
 mm                    = bhs.mod.mgr
+{check_string}        = bhs.checkers.curried
 
 #=============================================================================
 
 class GetChallengeHandler extends Handler
 
   _handle : (cb) ->
-    await sct.generate defer err, challenge_token
+    await sct.generate defer err, token
     unless err?
-      @pub { challenge_token }
+      @pub { challenge : { token } }
       @pub mm.config.security.challenge
     cb err
 
@@ -20,7 +21,10 @@ class GetChallengeHandler extends Handler
 
 class InitHandler extends Handler
 
-  needed_fields : -> [ "challenge_token", "challenge_response" ]
+  needed_inputs : -> {
+    "challenge.token"    : { checker : check_string(2)  } 
+    "challenge.solution" : { checker : check_string(10) }
+  }
   _handle : (cb) ->
     cb null
 
