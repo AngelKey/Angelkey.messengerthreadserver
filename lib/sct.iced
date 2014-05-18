@@ -23,14 +23,14 @@ exports.config = config = ({gen}) ->
 exports.generate = (cb) ->
   cfg = config { gen : true }
   tok = new SelfCertifiedToken { cfg } 
-  await tok.generate_to_client defer err, out
+  await tok.generate defer err, out
   cb err, out
 
 #=============================================================================
 
-exports.check = (raw, cb) ->
+exports.check = (json, cb) ->
   cfg = config { gen : false }
-  await SelfCertifiedToken.check_from_client raw, cfg, defer err, obj
+  await SelfCertifiedToken.check_from_client json, cfg, defer err, obj
   cb err, obj
 
 #=============================================================================
