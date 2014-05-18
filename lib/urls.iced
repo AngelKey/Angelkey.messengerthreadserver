@@ -4,7 +4,7 @@
 ##=================================================================================
 
 exports.api_route = (base) ->
-  "/api/#{constants.api.CURRENT_VERSION}/#{base}.json"
+  new RegExp "/api/#{constants.api.CURRENT_VERSION}/#{base}\\.(json|msgpack|msgpack64)"
 
 ##=================================================================================
 

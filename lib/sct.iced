@@ -39,7 +39,7 @@ class SelfCertifiedToken extends Base
 
   check_replay : (cb) ->
     q = "INSERT INTO used_challenge_tokens (token_id, ctime) VALUES(?,?)"
-    args = [ @id, unix_time() ]
+    args = [ @id.toString('hex'), unix_time() ]
     await mm.db.update1 q, args, defer err
     err.code = sc.SCT_REPLAY if err?
     cb err

@@ -13,8 +13,16 @@ class GetChallengeHandler extends Handler
   _handle : (cb) ->
     await sct.generate defer err, token
     unless err?
-      @pub { challenge : { token } }
-      @pub mm.config.security.challenge
+      cfg = mm.config.security.challenge
+      @pub { 
+        challenge : { 
+          token : token,
+          params : {
+            bytes : cfg.bytes
+            less_than : new Buffer(cfg.less_than, 'hex')
+          }
+        }
+      }
     cb err
 
 #=============================================================================
@@ -22,8 +30,8 @@ class GetChallengeHandler extends Handler
 class InitHandler extends Handler
 
   needed_inputs : -> {
-    "challenge.token"    : { checker : check_string(2)  } 
-    "challenge.solution" : { checker : check_string(10) }
+    "challenge.token"    : { checker : check_array(4) }
+    "challenge.solution" : { checker : check_buffer(1) }
   }
   _handle : (cb) ->
     cb null
