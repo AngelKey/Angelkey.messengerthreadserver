@@ -8,7 +8,7 @@ mm                    = bhs.mod.mgr
 
 #=============================================================================
 
-class GetChallengeHandler extends Handler
+class GetSessionChallengeHandler extends Handler
 
   _handle : (cb) ->
     await sct.generate defer err, token
@@ -27,7 +27,7 @@ class GetChallengeHandler extends Handler
 
 #=============================================================================
 
-class InitHandler extends Handler
+class SessionInitHandler extends Handler
 
   needed_inputs : -> {
     "challenge.token"    : { checker : check_array(4) }
@@ -39,8 +39,8 @@ class InitHandler extends Handler
 #=============================================================================
 
 exports.bind_to_app = (app) ->
-  GetChallengeHandler.bind app, api_route("challenge"), GET
-  InitHandler.bind         app, api_route("init"), POST
+  GetSessionChallengeHandler.bind app, api_route("session/challenge"), GET
+  SessionInitHandler.bind         app, api_route("session/init"), POST
 
 #=============================================================================
 
