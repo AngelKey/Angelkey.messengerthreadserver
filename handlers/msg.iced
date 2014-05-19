@@ -1,5 +1,5 @@
 
-{Handler,GET,POST}  = require('base-http-server').base
+{Handler,GET,POST}  = require('keybase-http-server').base
 
 #=============================================================================
 

@@ -1,5 +1,5 @@
 
-bhs                   = require 'base-http-server'
+bhs                   = require 'keybase-http-server'
 Base                  = bhs.sct.SelfCertifiedToken
 mm                    = bhs.mod.mgr
 idmod                 = bhs.id

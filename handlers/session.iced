@@ -1,5 +1,5 @@
 
-bhs                   = require 'base-http-server'
+bhs                   = require 'keybase-http-server'
 {Handler,GET,POST}    = bhs.base
 {api_route}           = require '../lib/urls'
 challenge             = require '../lib/challenge'
