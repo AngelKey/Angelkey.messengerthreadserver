@@ -2,7 +2,7 @@
 bhs                   = require 'base-http-server'
 {Handler,GET,POST}    = bhs.base
 {api_route}           = require '../lib/urls'
-sct                   = require '../lib/sct'
+challenge             = require '../lib/challenge'
 mm                    = bhs.mod.mgr
 {checkers}            = require 'keybase-bjson-core'
 {make_esc}            = require 'iced-error'
@@ -18,7 +18,7 @@ class GetSessionChallengeHandler extends Handler
     return out
 
   _handle : (cb) ->
-    await sct.generate defer err, token
+    await challenge.generate defer err, token
     unless err?
       cfg = mm.config.security.challenge
       @pub { 
@@ -44,7 +44,7 @@ class SessionInitHandler extends Handler
 
   _handle : (cb) ->
     esc = make_esc cb, "SessionInitHandler::_handle"
-    await sct.check @input.challenge, esc defer token
+    await challenge.check @input.challenge, esc defer token
     @pub { session_id : token.id }
     cb null
 

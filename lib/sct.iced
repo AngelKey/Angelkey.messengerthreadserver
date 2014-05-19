@@ -15,7 +15,7 @@ exports.config = config = ({gen, solution}) ->
   cfg = 
     lifetime : mm.config.security.sct.lifetime
     key : mm.config.secrets.sct_key
-    klass : SelfCertifiedToken
+    klass : ChallengeToken
     solution : solution
   if gen
     cfg.id = idmod.generate mm.config.id.sct 
@@ -25,7 +25,7 @@ exports.config = config = ({gen, solution}) ->
 
 exports.generate = (cb) ->
   cfg = config { gen : true }
-  tok = new SelfCertifiedToken { cfg } 
+  tok = new ChallengeToken { cfg } 
   await tok.generate defer err, out
   cb err, out
 
@@ -33,12 +33,12 @@ exports.generate = (cb) ->
 
 exports.check = ({token, solution}, cb) ->
   cfg = config { gen : false, solution }
-  await SelfCertifiedToken.check_from_client token, cfg, defer err, obj
+  await ChallengeToken.check_from_client token, cfg, defer err, obj
   cb err, obj
 
 #=============================================================================
 
-class SelfCertifiedToken extends Base
+class ChallengeToken extends Base
 
   #-----------------
 
@@ -62,8 +62,6 @@ class SelfCertifiedToken extends Base
     target = new Buffer cfg.less_than, 'hex'
     sol = wa.to_buffer()
     if buffer_cmp_ule(sol,target) >= 0
-      console.log sol
-      console.log target
       err = new Error "solution failed"
       err.code = sc.SCT_BAD_SOLUTION
     cb err
