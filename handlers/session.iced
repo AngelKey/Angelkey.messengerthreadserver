@@ -4,11 +4,18 @@ bhs                   = require 'base-http-server'
 {api_route}           = require '../lib/urls'
 sct                   = require '../lib/sct'
 mm                    = bhs.mod.mgr
-{check_string}        = bhs.checkers.curried
+{checkers}            = require 'keybase-bjson-core'
+{make_esc}            = require 'iced-error'
 
 #=============================================================================
 
 class GetSessionChallengeHandler extends Handler
+
+  params : () ->
+    out = {}
+    out[k] = v for k,v of mm.config.security.challenge
+    out.less_than = new Buffer out.less_than, 'hex'
+    return out
 
   _handle : (cb) ->
     await sct.generate defer err, token
@@ -17,10 +24,7 @@ class GetSessionChallengeHandler extends Handler
       @pub { 
         challenge : { 
           token : token,
-          params : {
-            bytes : cfg.bytes
-            less_than : new Buffer(cfg.less_than, 'hex')
-          }
+          params : @params()
         }
       }
     cb err
@@ -29,11 +33,19 @@ class GetSessionChallengeHandler extends Handler
 
 class SessionInitHandler extends Handler
 
-  needed_inputs : -> {
-    "challenge.token"    : { checker : check_array(4) }
-    "challenge.solution" : { checker : check_buffer(1) }
+  input_template : -> {
+    challenge : {
+      token : [ checkers.value(1), checkers.buffer(0,100) ]
+      solution : checkers.buffer(1)
+    }
   }
+
+  #-------------------------
+
   _handle : (cb) ->
+    esc = make_esc cb, "SessionInitHandler::_handle"
+    await sct.check @input.challenge, esc defer token
+    @pub { session_id : token.id }
     cb null
 
 #=============================================================================
