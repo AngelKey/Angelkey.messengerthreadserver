@@ -7,6 +7,6 @@ exports.config =
     N : (1 << 10)
     r : 8
     p : 1
-    less_than : "0010"
+    less_than : "0100"
   session:
     lifetime : 60
