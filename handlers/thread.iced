@@ -18,6 +18,7 @@ class InitThreadHandler extends Handler
   input_template : -> {
     session_id : checkers.buffer(4)   # valid session ID
     i : checkers.buffer(8)            # the thread ID
+    etime : checkers.intval()
     users : checkers.array {
       min : 2, 
       checker : arr_subchecker {
@@ -55,8 +56,14 @@ class InitThreadHandler extends Handler
     dbtx.push q, args
 
     for u,i in @input.users
-      q = """INSERT INTO thread_keys (thread_id, user_zid, key_data, write_key)
+      q = """INSERT INTO thread_keys (thread_id, user_zid, key_data, write_key, etime)
+             VALUES(?,?,?,?,?)
           """
+      args = [ @input.i, i, u.ctext, u.t, @input.etime ]
+      dbtx.push q, args
+
+    await mm.db.transaction dbtx, defer err
+    cb err
 
   #----------------
 
