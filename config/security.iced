@@ -8,3 +8,5 @@ exports.config =
     r : 8
     p : 1
     less_than : "0010"
+  session:
+    lifetime : 60
