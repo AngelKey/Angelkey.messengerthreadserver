@@ -2,12 +2,12 @@
 bhs                   = require 'keybase-http-server'
 Base                  = bhs.sct.SelfCertifiedToken
 mm                    = bhs.mod.mgr
-idmod                 = bhs.id
 sc                    = bhs.status.codes
 triplesec             = require 'triplesec'
 {WordArray,scrypt}    = triplesec
 {buffer_cmp_ule}      = triplesec.util
 {unix_time}           = require('iced-utils').util
+idg                   = require('keybase-messenger-core').id.generators
 
 #=============================================================================
 
@@ -18,7 +18,7 @@ exports.config = config = ({gen, solution}) ->
     klass : ChallengeToken
     solution : solution
   if gen
-    cfg.id = idmod.generate mm.config.id.sct 
+    cfg.id = idg.sct()
   return cfg
 
 #=============================================================================
