@@ -6,6 +6,7 @@ challenge             = require '../lib/challenge'
 mm                    = bhs.mod.mgr
 {checkers}            = require 'keybase-bjson-core'
 {make_esc}            = require 'iced-error'
+idcheckers            = require('keybase-messenger-core').id.checkers
 
 #=============================================================================
 
@@ -35,7 +36,7 @@ class SessionInitHandler extends Handler
 
   input_template : -> {
     challenge : {
-      token : [ checkers.value(1), checkers.buffer(0,100) ]
+      token : [ checkers.value(1), idcheckers.sct ]
       solution : checkers.buffer(1)
     }
   }

@@ -9,7 +9,8 @@ mm                        = bhs.mod.mgr
 DbTx                      = bhs.mod.db
 {checkers,arr_subchecker} = require 'keybase-bjson-core'
 {make_esc}                = require 'iced-error'
-{unix_time}                = require('iced-utils').util
+{unix_time}               = require('iced-utils').util
+idcheckers            = require('keybase-messenger-core').id.checkers
 
 #=============================================================================
 
@@ -20,13 +21,13 @@ H = (x) -> x.toString('hex')
 class InitThreadHandler extends Handler
 
   input_template : -> {
-    session_id : checkers.buffer(4)   # valid session ID
-    i : checkers.buffer(8)            # the thread ID
+    session_id : idcheckers.session   # valid session ID
+    i : idcheckers.thread             # the thread ID
     etime : checkers.intval()
     users : checkers.array {
       min : 2, 
       checker : arr_subchecker {
-        t : checkers.buffer(8)        # the write token
+        t : idcheckers.write_token    # the write token
         ctext : checkers.string(10)   # the encrypted bundle for the user
       }
     }
@@ -79,8 +80,19 @@ class InitThreadHandler extends Handler
 
 #=============================================================================
 
+class UpdateWriteTokenHandler extends Handler
+
+  input_template : -> {
+    i : checkers.buffer
+
+
+  }
+
+#=============================================================================
+
 exports.bind_to_app = (app) ->
   InitThreadHandler.bind app, api_route("thread/init"), POST
+  UpdateWriteTokenHandler.bind app, api_route("thread/update_write_token"), POST
 
 #=============================================================================
 
