@@ -10,7 +10,7 @@ DbTx                      = bhs.mod.db
 {checkers,arr_subchecker} = require 'keybase-bjson-core'
 {make_esc}                = require 'iced-error'
 {unix_time}               = require('iced-utils').util
-idcheckers            = require('keybase-messenger-core').id.checkers
+idcheckers                = require('keybase-messenger-core').id.checkers
 
 #=============================================================================
 
@@ -82,11 +82,32 @@ class InitThreadHandler extends Handler
 
 class UpdateWriteTokenHandler extends Handler
 
+  #--------------------
+
   input_template : -> {
-    i : checkers.buffer
-
-
+    i : idcheckers.thread()
+    user_zid : checkers.intval(0)
+    old_token : idcheckers.write_token()
+    new_token : idcheckers.write_token()
   }
+
+  #--------------------
+
+  write : (cb) ->
+    q = """UPDATE thread_keys 
+           SET write_key=?
+           WHERE thread_id=?
+           AND user_zid=?
+           AND write_key=?"""
+    args = [ H(@input.new_token), H(@input.i), @input.user_zid, H(@input.old_token)]
+    await mm.db.update1 q, args, defer err
+    cb err
+
+  #--------------------
+
+  _handle : (cb) ->
+    await @write defer err
+    cb err
 
 #=============================================================================
 
