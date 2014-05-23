@@ -15,7 +15,7 @@ CREATE TABLE `thread_keys` (
 	user_zid INT(11) UNSIGNED NOT NULL,            --- #0, #1, #2, etc. lowest UID gets 0.
 	key_data TEXT NOT NULL,                        --- Armor64-ed PGP message
 	etime BIGINT UNSIGNED NOT NULL,                --- When to delete the key
-	write_key CHAR(64) NOT NULL,                   --- conversants need to prove knowledge of this key to write
+	write_token CHAR(64) NOT NULL,                 --- conversants need to prove knowledge of this key to write
 	temp_signing_public_key TEXT,                  --- temporary signing key	
 	key_proof TEXT,                                --- Proof of that key with their main public key
 	temp_signing_secret_key TEXT,                  --- encrypted version of the signing key

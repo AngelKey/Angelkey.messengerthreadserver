@@ -10,7 +10,9 @@ DbTx                      = bhs.mod.db
 {checkers,arr_subchecker} = require 'keybase-bjson-core'
 {make_esc}                = require 'iced-error'
 {unix_time}               = require('iced-utils').util
-idcheckers                = require('keybase-messenger-core').id.checkers
+kbmc                      = require('keybase-messenger-core')
+idcheckers                = kbmc.id.checkers
+cipher_checker            = kbmc.Cipher.checker
 
 #=============================================================================
 
@@ -61,7 +63,7 @@ class InitThreadHandler extends Handler
     dbtx.push q, args
 
     for u,i in @input.users
-      q = """INSERT INTO thread_keys (thread_id, user_zid, key_data, write_key, etime)
+      q = """INSERT INTO thread_keys (thread_id, user_zid, key_data, write_token, etime)
              VALUES(?,?,?,?,?)
           """
       args = [ H(@input.i), i, u.ctext, H(u.t), @input.etime ]
@@ -95,10 +97,10 @@ class UpdateWriteTokenHandler extends Handler
 
   write : (cb) ->
     q = """UPDATE thread_keys 
-           SET write_key=?
+           SET write_token=?
            WHERE thread_id=?
            AND user_zid=?
-           AND write_key=?"""
+           AND write_token=?"""
     args = [ H(@input.new_token), H(@input.i), @input.user_zid, H(@input.old_token)]
     await mm.db.update1 q, args, defer err
     cb err
@@ -111,9 +113,29 @@ class UpdateWriteTokenHandler extends Handler
 
 #=============================================================================
 
+class AuthorizeHandler extends Handler
+
+  input_template : -> {
+    i : idcheckers.thread()
+    user_zid : checkers.intval()
+    token : idcheckers.write_token()
+    keys :
+      public : cipher_checker
+      private : checkers.string(30)
+  }
+
+
+  #--------------------
+
+  _handle : (cb) ->
+    cb null
+
+#=============================================================================
+
 exports.bind_to_app = (app) ->
   InitThreadHandler.bind app, api_route("thread/init"), POST
   UpdateWriteTokenHandler.bind app, api_route("thread/update_write_token"), POST
+  AuthorizeHandler.bind app, api_route("thread/authorize"), POST
 
 #=============================================================================
 
