@@ -12,7 +12,7 @@ DbTx                      = bhs.mod.db
 {unix_time}               = require('iced-utils').util
 kbmc                      = require('keybase-messenger-core')
 idcheckers                = kbmc.id.checkers
-cipher_checker            = kbmc.Cipher.checker
+{Cipher}                  = kbmc
 
 #=============================================================================
 
@@ -119,16 +119,36 @@ class AuthorizeHandler extends Handler
     i : idcheckers.thread()
     user_zid : checkers.intval()
     token : idcheckers.write_token()
+    sig : checkers.string(30)
     keys :
-      public : cipher_checker
+      public : Cipher.checker
       private : checkers.string(30)
   }
 
+  #--------------------
+
+  write : (cb) ->
+    q = """UPDATE thread_keys
+           SET signing_key_private=?, signing_key_public=?, key_proof=?
+           WHERE thread_id=?
+           AND user_zid=?
+           AND write_token=?"""
+    args = [
+      @input.keys.private
+      Cipher.encode_to_db(@input.keys.public)
+      @input.sig
+      H(@input.i)
+      @input.user_zid
+      H(@input.token)
+    ]
+    await mm.db.update1 q, args, defer err
+    cb err
 
   #--------------------
 
   _handle : (cb) ->
-    cb null
+    await @write defer err
+    cb err
 
 #=============================================================================
 
