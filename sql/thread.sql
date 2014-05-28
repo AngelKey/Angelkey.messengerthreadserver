@@ -30,7 +30,7 @@ CREATE TABLE `messages` (
 	num_chunks INT(11) UNSIGNED NOT NULL,          --- the number of chunks in the mesasge (usually 1)
 	etime BIGINT UNSIGNED NOT NULL,                --- When to delete the message
 	sig TEXT,                                      --- optional signature by the author
-	prev_msg_zid INT(11) UNSIGNED NOT NULL,        --- the last zid this client got.
+	prev_msg_zid INT(11) UNSIGNED NOT NULL,        --- the last zid this client got
 	parent_msg_zid INT(11) UNSIGNED NOT NULL,      --- Parent MSG for atachments, or 0 for not parent
 	PRIMARY KEY (`thread_id`, `msg_zid`),
 	CONSTRAINT `messages_ibfk_1` FOREIGN KEY(`thread_id`) REFERENCES `threads` (`thread_id`)
