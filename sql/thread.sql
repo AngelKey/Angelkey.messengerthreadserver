@@ -16,7 +16,7 @@ CREATE TABLE `thread_keys` (
 	key_data TEXT NOT NULL,                        --- Armor64-ed PGP message
 	etime BIGINT UNSIGNED NOT NULL,                --- When to delete the key
 	write_token CHAR(64) NOT NULL,                 --- conversants need to prove knowledge of this key to write
-	signing_key_public TEXT,                       --- temporary signing key	
+	signing_key_public BLOB,                       --- temporary signing key	
 	key_proof TEXT,                                --- Proof of that key with their main public key
 	signing_key_private TEXT,                      --- encrypted version of the signing key
 	PRIMARY KEY (`thread_id`, `user_zid`),
@@ -40,7 +40,7 @@ CREATE TABLE `chunks` (
     thread_id CHAR(64) NOT NULL,                   --- Thread ID
     msg_zid INT(11) UNSIGNED NOT NULL,             --- MSG id integer sequence number in that thread
     chunk_zid INT(11) UNSIGNED NOT NULL,           --- chunk id integer sequence number in that message
-    data MEDIUMTEXT NOT NULL,                      --- Encrypted data.
+    data MEDIUMBLOB NOT NULL,                      --- Encrypted data.
     PRIMARY KEY (`thread_id`, `msg_zid`, `chunk_zid`),
     CONSTRAINT `chunks_ibfk_1` FOREIGN KEY(`thread_id`, `msg_zid`) REFERENCES `messages` (`thread_id`, `msg_zid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -52,6 +52,7 @@ class PostHeaderHandler extends Base
     etime : checkers.nnint
     prev_msg_zid : checkers.nnint
     num_chunks : checkers.pint
+    parent_msg_zid : checkers.nnint
   }
 
   #-----------------------
@@ -67,6 +68,7 @@ class PostHeaderHandler extends Base
 
   insert_loop : (cb) ->
     err = null
+    go = true
     while go
       await @insert defer err
       if not err? then go = false
@@ -85,17 +87,36 @@ class PostHeaderHandler extends Base
     await mm.db.load1 q, args, esc defer row
     @msg_zid = (row.m or 0) + 1
     q = """INSERT INTO messages
-             (thread_id, msg_zid, sender_zid, num_chunks, etime, prev_msg_zid)
-            VALUES(?,?,?,?,?,?)"""
+             (thread_id, msg_zid, sender_zid, num_chunks, etime, prev_msg_zid, parent_msg_zid)
+            VALUES(?,?,?,?,?,?,?)"""
     args = [ H(@input.i), @msg_zid, @input.sender_zid, 
-             @input.num_chunks, @input.etime, @input.prev_msg_zid]
+             @input.num_chunks, @input.etime, @input.prev_msg_zid, @input.parent_msg_zid]
     await mm.db.update1 q, args, esc defer()
     cb null
 
 #=============================================================================
 
+class PostChunkHandler extends Base
+
+  input_template : -> dict_merge super(), {
+    chunk_zid : checkers.nnint
+    msg_zid : checkers.nnint
+    data : Cipher.checker
+  }
+
+  #-----------------
+
+  _handle : (cb) ->
+    q = "INSERT INTO chunks (thread_id, msg_zid, chunk_zid, data) VALUES(?,?,?,FROM_BASE64(?))"
+    args = [ H(@input.i), @input.msg_zid, @input.chunk_zid, Cipher.encode_to_db(@input.data) ]
+    await mm.db.update1 q, args, defer err
+    cb err
+
+#=============================================================================
+
 exports.bind_to_app = (app) ->
   PostHeaderHandler.bind app, api_route("msg/header"), POST
+  PostChunkHandler.bind app, api_route("msg/chunk"), POST
 
 #=============================================================================
 

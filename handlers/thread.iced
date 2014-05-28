@@ -129,7 +129,7 @@ class AuthenticateHandler extends Handler
 
   write : (cb) ->
     q = """UPDATE thread_keys
-           SET signing_key_private=?, signing_key_public=?, key_proof=?
+           SET signing_key_private=?, signing_key_public=FROM_BASE64(?), key_proof=?
            WHERE thread_id=?
            AND user_zid=?
            AND write_token=?"""
