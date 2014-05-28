@@ -37,7 +37,7 @@ class Base extends Handler
     args = [ H(@input.i), @input.sender_zid ]
     await mm.db.load1 q, args, defer err, row
     if err? then # noop
-    else if not bufeq_secure G(row.write_token), @input.write_token
+    else if not bufeq_secure G(row.write_token), @input.t
       err = new Error "permission denied: bad write token"
       err.sc = sc.PERMISSION_DENIED
     cb err
@@ -46,11 +46,51 @@ class Base extends Handler
 
 class PostHeaderHandler extends Base
 
+  #-----------------------
+
   input_template : -> dict_merge super(), {
     etime : checkers.nnint
     prev_msg_zid : checkers.nnint
     num_chunks : checkers.pint
   }
+
+  #-----------------------
+
+  _handle : (cb) ->
+    go = true
+    esc = make_esc cb, "PostHeaderHandler::_handle"
+    await @insert_loop esc defer()
+    @pub { @msg_zid }
+    cb null
+
+  #-----------------------
+
+  insert_loop : (cb) ->
+    err = null
+    while go
+      await @insert defer err
+      if not err? then go = false
+      else if err.code in [ 'ER_DUP_KEY', 'ER_DUP_ENTRY' ] 
+        await setTimeout defer(), 1
+      else
+        go = false
+    cb err
+
+  #-----------------------
+
+  insert : (cb) -> 
+    esc = make_esc cb, 'PostHeaderHandler::_handle::ins'
+    q = "SELECT MAX(msg_zid) as m FROM messages WHERE thread_id=?"
+    args = [ H(@input.i) ]
+    await mm.db.load1 q, args, esc defer row
+    @msg_zid = (row.m or 0) + 1
+    q = """INSERT INTO messages
+             (thread_id, msg_zid, sender_zid, num_chunks, etime, prev_msg_zid)
+            VALUES(?,?,?,?,?,?)"""
+    args = [ H(@input.i), @msg_zid, @input.sender_zid, 
+             @input.num_chunks, @input.etime, @input.prev_msg_zid]
+    await mm.db.update1 q, args, esc defer()
+    cb null
 
 #=============================================================================
 
