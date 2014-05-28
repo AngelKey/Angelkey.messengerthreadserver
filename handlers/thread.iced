@@ -87,10 +87,10 @@ class UpdateWriteTokenHandler extends Handler
   #--------------------
 
   input_template : -> {
-    i : idcheckers.thread()
+    i : idcheckers.thread
     user_zid : checkers.intval(0)
-    old_token : idcheckers.write_token()
-    new_token : idcheckers.write_token()
+    old_token : idcheckers.write_token
+    new_token : idcheckers.write_token
   }
 
   #--------------------
@@ -113,12 +113,12 @@ class UpdateWriteTokenHandler extends Handler
 
 #=============================================================================
 
-class AuthorizeHandler extends Handler
+class AuthenticateHandler extends Handler
 
   input_template : -> {
-    i : idcheckers.thread()
+    i : idcheckers.thread
     user_zid : checkers.intval()
-    token : idcheckers.write_token()
+    token : idcheckers.write_token
     sig : checkers.string(30)
     keys :
       public : Cipher.checker
@@ -155,7 +155,7 @@ class AuthorizeHandler extends Handler
 exports.bind_to_app = (app) ->
   InitThreadHandler.bind app, api_route("thread/init"), POST
   UpdateWriteTokenHandler.bind app, api_route("thread/update_write_token"), POST
-  AuthorizeHandler.bind app, api_route("thread/authorize"), POST
+  AuthenticateHandler.bind app, api_route("thread/authenticate"), POST
 
 #=============================================================================
 

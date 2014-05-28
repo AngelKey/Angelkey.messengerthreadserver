@@ -4,4 +4,5 @@ exports.config =
   files : [
     "thread.iced"
     "session.iced"
+    "msg.iced"
   ]
