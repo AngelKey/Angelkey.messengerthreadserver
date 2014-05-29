@@ -46,9 +46,9 @@ CREATE TABLE `chunks` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `deletions` (
-    thread_id CHAR(64) NOT NULL,                   --- Thread ID
-    user_zid INT(11) UNSIGNED NOT NULL,            --- The user who deleted
-    msg_zid INT(11) UNSIGNED NOT NULL,             --- Which message s/he deleted at
-    PRIMARY KEY (`thread_id`, `user_zid`),
+    thread_id CHAR(64) NOT NULL,                     --- Thread ID
+    user_zid INT(11) UNSIGNED NOT NULL,              --- The user who deleted
+    msg_zid INT(11) UNSIGNED NOT NULL,               --- Which message s/he deleted at
+    PRIMARY KEY (`thread_id`, `user_zid`,`msg_zid`), --- Can have multiple deletions for partial orders
     CONSTRAINT `deletions_ibkf_1` FOREIGN KEY(`thread_id`, `user_zid`) REFERENCES `thread_keys` (`thread_id`, `user_zid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

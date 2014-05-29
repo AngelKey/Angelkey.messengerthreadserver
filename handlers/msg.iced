@@ -132,6 +132,22 @@ class PostSigHandler extends Base
 
 #=============================================================================
 
+class DeleteHandler extends Base
+
+  input_template : -> dict_merge super(), {
+    msg_zid : checkers.nnint
+  }
+
+  #-----
+
+  _handle : (cb) ->
+    q = "REPLACE INTO deletions(thread_id,user_zid,msg_zid) VALUES(?,?,?)"
+    args = [ H(@input.i), @input.sender_zid, @input.msg_zid ]
+    await mm.db.update1 q, args, defer(err), true
+    cb err
+
+#=============================================================================
+
 exports.bind_to_app = (app) ->
   PostHeaderHandler.bind app, api_route("msg/header"), POST
   PostChunkHandler.bind app, api_route("msg/chunk"), POST
