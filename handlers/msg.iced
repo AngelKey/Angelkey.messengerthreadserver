@@ -11,6 +11,7 @@ DbTx                      = bhs.mod.db
 {bufeq_secure,dict_merge,unix_time} = require('iced-utils').util
 kbmc                      = require('keybase-messenger-core')
 idcheckers                = kbmc.id.checkers
+pgpchecker                = kbmc.pgp.checker
 {Cipher}                  = kbmc
 
 #=============================================================================
@@ -101,14 +102,31 @@ class PostChunkHandler extends Base
   input_template : -> dict_merge super(), {
     chunk_zid : checkers.nnint
     msg_zid : checkers.nnint
-    data : Cipher.checker
+    ctext : Cipher.checker
   }
 
   #-----------------
 
   _handle : (cb) ->
     q = "INSERT INTO chunks (thread_id, msg_zid, chunk_zid, data) VALUES(?,?,?,FROM_BASE64(?))"
-    args = [ H(@input.i), @input.msg_zid, @input.chunk_zid, Cipher.encode_to_db(@input.data) ]
+    args = [ H(@input.i), @input.msg_zid, @input.chunk_zid, Cipher.encode_to_db(@input.ctextechunk) ]
+    await mm.db.update1 q, args, defer err
+    cb err
+
+#=============================================================================
+
+class PostSigHandler extends Base
+
+  input_template : -> dict_merge super(), {
+    sig : pgpchecker()
+    msg_zid : checkers.nnint
+  }
+
+  #-----
+
+  _handle : (cb) ->
+    q = "UPDATE messages SET sig=? WHERE thread_id=? and msg_zid=? and sender_zid=?"
+    args = [ @input.sig, H(@input.i), @input.msg_zid, @input.sender_zid ]
     await mm.db.update1 q, args, defer err
     cb err
 
@@ -117,6 +135,7 @@ class PostChunkHandler extends Base
 exports.bind_to_app = (app) ->
   PostHeaderHandler.bind app, api_route("msg/header"), POST
   PostChunkHandler.bind app, api_route("msg/chunk"), POST
+  PostSigHandler.bind app, api_route("msg/sig"), POST
 
 #=============================================================================
 
