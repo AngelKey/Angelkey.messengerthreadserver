@@ -1,5 +1,5 @@
 bhs                       = require 'keybase-http-server'
-{Handler,GET,POST}        = bhs.base
+{Handler,GET,POST,DELETE} = bhs.base
 sc                        = bhs.status.codes
 log                       = bhs.log
 {api_route}               = require '../lib/urls'
@@ -136,6 +136,7 @@ exports.bind_to_app = (app) ->
   PostHeaderHandler.bind app, api_route("msg/header"), POST
   PostChunkHandler.bind app, api_route("msg/chunk"), POST
   PostSigHandler.bind app, api_route("msg/sig"), POST
+  DeleteHandler.bind app, api_route("msg"), DELETE
 
 #=============================================================================
 
