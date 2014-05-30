@@ -22,8 +22,8 @@ class GetChallengeHandler extends Handler
 class InitHandler extends Handler
 
   needed_inputs : -> {
-    "challenge.token"    : { checker : check_string(2)  } 
-    "challenge.solution" : { checker : check_string(10) }
+    "challenge.token"    : check_string(2),
+    "challenge.solution" : check_string(10)
   }
   _handle : (cb) ->
     cb null
