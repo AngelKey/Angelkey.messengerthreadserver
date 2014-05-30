@@ -1,5 +1,5 @@
 
-BHSBIN=./node_modules/base-http-server/bin
+BHSBIN=./node_modules/keybase-http-server/bin
 
 run:
 	${BHSBIN}/app.js

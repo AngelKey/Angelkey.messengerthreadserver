@@ -2,6 +2,7 @@
 exports.config = 
   dir : "handlers"
   files : [
-    "msg.iced"
     "thread.iced"
+    "session.iced"
+    "msg.iced"
   ]
